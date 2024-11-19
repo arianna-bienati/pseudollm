@@ -1,0 +1,30 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.envs.static]
+dev-mode = true
+dev-mode-dirs = ["."]
+
+[project]
+name = "pseudollm"
+description = "Pseudonymize with the help of OpenAI Large Language Models"
+readme = "README.md"
+license-files = { paths = ["LICENSE"] }
+requires-python = ">=3.8"
+authors = [
+  { name = "Arianna Bienati", email = "abienati@eurac.edu" }
+]
+classifiers = [
+  "Programming Language :: Python :: 3.8",
+  "Operating System :: OS Independent"
+]
+dependencies = [
+]
+
+version = "0.0.1"
+# dynamic = ["version"]
+
+
+[project.scripts]
+pseudollm = "pseudollm.main:main"
