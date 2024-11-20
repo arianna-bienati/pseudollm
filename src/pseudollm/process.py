@@ -1,8 +1,8 @@
-import openai
+from openai import OpenAI
 
-def annotate_pii(input_file, output_file, example_file, api_key=None):
+def annotate_pii(input_file, output_file, example_file):
     """
-    Annotates a single text file with tags for personally identifiable information (PII).
+    Annotates a text file with tags for personally identifiable information (PII).
 
     Args:
         input_file (str): Path to the input text file.
@@ -10,9 +10,8 @@ def annotate_pii(input_file, output_file, example_file, api_key=None):
         example_file (str): Path to the example file with annotated tags.
         api_key (str): OpenAI API key (optional if set as an environment variable).
     """
-    # Set OpenAI API key if provided
-    if api_key:
-        openai.api_key = api_key
+    # Initialize OpenAI client
+    client = OpenAI()
 
     # Read input file
     with open(input_file, 'r') as f:
@@ -23,12 +22,12 @@ def annotate_pii(input_file, output_file, example_file, api_key=None):
         example = ex.read()
 
     # Generate a completion using the model
-    completion = openai.ChatCompletion.create(
-        model="gpt-4",
+    completion = client.chat.completions.create(
+        model="gpt-4o-mini",
         messages=[
             {
                 "role": "user",
-                "content": "Annotate all Personally Identifiable Information in the following text (e.g., names, places, organizations, project names, etc.). "
+                "content": "Annotate all Personally Identifiable Information in the following text (e.g., names, places,  organizations, project names, etc.). "
                            "Use the tags <to_pseudonym> </to_pseudonym> to tag them. Do not use different tags. Just output the tagged text, without any further comment. "
                            "Do not change the original text."
             },
@@ -49,7 +48,7 @@ def annotate_pii(input_file, output_file, example_file, api_key=None):
     )
 
     # Extract the model's response (the completion result)
-    response = completion['choices'][0]['message']['content']
+    response = completion.choices[0].message.content
 
     # Write the output to a file
     with open(output_file, 'w') as out_f:
