@@ -20,6 +20,8 @@ classifiers = [
   "Operating System :: OS Independent"
 ]
 dependencies = [
+  "argcomplete>=3",
+  "openai>=1"
 ]
 
 version = "0.0.1"
