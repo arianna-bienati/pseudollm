@@ -1,6 +1,6 @@
 from openai import OpenAI
 
-def annotate_pii(input_file, example_file, output_dir):
+def annotate_pii(input_file, output_file, example_file):
     """
     Annotates a text file with tags for personally identifiable information (PII).
 
@@ -8,7 +8,6 @@ def annotate_pii(input_file, example_file, output_dir):
         input_file (str): Path to the input text file.
         output_file (str): Path to the output file to save the tagged text.
         example_file (str): Path to the example file with annotated tags.
-        api_key (str): OpenAI API key (optional if set as an environment variable).
     """
     # Initialize OpenAI client
     client = OpenAI()
@@ -51,7 +50,6 @@ def annotate_pii(input_file, example_file, output_dir):
     response = completion.choices[0].message.content
 
     # Write the output to a file
-    output_file = output_dir / input_file.name
     with open(output_file, 'w') as out_f:
         out_f.write(response)
 
