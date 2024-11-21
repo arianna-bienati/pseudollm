@@ -1,5 +1,7 @@
-import re
 import json
+import logging
+import re
+
 from openai import OpenAI
 
 def annotate_pii(input_file, output_file, example_file):
@@ -28,7 +30,7 @@ def annotate_pii(input_file, output_file, example_file):
         messages=[
             {
                 "role": "user",
-                "content": "Annotate all Personally Identifiable Information in the following text (e.g., names, places,  organizations, project names, etc.). "
+                "content": "Annotate all Personally Identifiable Information in the following text (e.g., names, places, organizations, project names, etc.). "
                            "Use the tags <to_pseudonym> </to_pseudonym> to tag them. Do not use different tags. Just output the tagged text, without any further comment. "
                            "Do not change the original text."
             },
@@ -58,12 +60,8 @@ def annotate_pii(input_file, output_file, example_file):
     print(f"Annotated file saved to {output_file}")
 
 def extract_tags(tagged_text):
-    with open(tagged_text, 'r') as f:
-        file_content = f.read()
-    
-    matches = re.findall(r"<to_pseudonym>(.*?)</to_pseudonym>", file_content)
+    matches = re.findall(r"<to_pseudonym>(.*?)</to_pseudonym>", tagged_text)
     return matches
-
 
 def generate_pseudonyms(entities):
     """
@@ -101,7 +99,7 @@ def generate_pseudonyms(entities):
     response_format={
         "type": "json_schema",
         "json_schema": {
-            "name": "math_reasoning",
+            "name": "map_pseudonyms",
             "schema": {
                 "type": "object",
                 "properties": {
@@ -131,8 +129,6 @@ def generate_pseudonyms(entities):
     pseudonym_map = json.loads(response)
     
     return pseudonym_map
-
-import logging
 
 def pseudonymization(tagged_text, pseudonym_map, logger=None):
     """
@@ -172,9 +168,4 @@ def pseudonymization(tagged_text, pseudonym_map, logger=None):
             logger.info(f"Replaced '{original}' with '{pseudonym}'")
     
     logger.info(f"Total replacements: {replacements_made}")
-    
-    # Write the output to a file
-    with open(tagged_text, 'w') as out_f:
-        out_f.write(tagged_text)
-
-    print(f"Annotated file saved to {tagged_text}")
+    return tagged_text
