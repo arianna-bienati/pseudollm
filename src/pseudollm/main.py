@@ -17,7 +17,26 @@ def _tag(args):
         output_file = output_dir / f"{input_path.stem}_tagged{input_path.suffix}"
         example_file = Path(args.example_file).resolve()
         process.annotate_pii(input_path, output_file, example_file)
-        print(f"Converted {input_file} to {output_file}")
+        print(f"Annotated and saved to {output_file}")
+
+def _pseudonymize(args):
+    output_dir = Path(args.output_dir)
+    output_dir.mkdir(exist_ok=True)
+
+    for input_file in tqdm(args.input_files, desc="Pseudonymizing files"):
+        input_path = Path(input_file).resolve()
+        with open(input_file, 'r') as f:
+            file_content = f.read()
+        
+        matches = process.extract_tags(file_content)
+        pseudonym_dict = process.generate_pseudonyms(matches)
+        pseudonym_text = process.pseudonymization(file_content, pseudonym_dict)
+
+        output_file = output_dir / f"{input_path.stem}_pseudonym{input_path.suffix}"
+        with open(output_file, 'w') as out_f:
+            out_f.write(pseudonym_text)
+
+        print(f"Pseudonymized and saved to {output_file}")
 
 def main():
     parser = argparse.ArgumentParser(
@@ -49,6 +68,23 @@ def main():
     
     parser_tag.set_defaults(func=_tag)
 
+    parser_pseudonymize = subparsers.add_parser('pseudonymize',
+        description='Pseudonymize Personally Identifiable Information in texts',
+        help='Pseudonymize Personally Identifiable Information in texts')
+    
+    parser_pseudonymize.add_argument("-o", "--output_dir",
+        type=str,
+        default=".",
+        help="Output directory. Default: Current directory.")
+    
+    parser_pseudonymize.add_argument("-i", "--input_files",
+        type=str,
+        nargs="+",
+        required=True,
+        help="Input text files.")
+    
+    parser_pseudonymize.set_defaults(func=_pseudonymize)
+    
     args = parser.parse_args()
     
     if not hasattr(args, 'func'):
