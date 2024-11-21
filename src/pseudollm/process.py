@@ -58,7 +58,10 @@ def annotate_pii(input_file, output_file, example_file):
     print(f"Annotated file saved to {output_file}")
 
 def extract_tags(tagged_text):
-    matches = re.findall(r"<to_pseudonym>(.*?)</to_pseudonym>", tagged_text)
+    with open(tagged_text, 'r') as f:
+        file_content = f.read()
+    
+    matches = re.findall(r"<to_pseudonym>(.*?)</to_pseudonym>", file_content)
     return matches
 
 
@@ -87,7 +90,7 @@ def generate_pseudonyms(entities):
     }]},
         {
             "role": "user", 
-            "content": "\n".join(list(set(entities)))
+            "content": "\n".join(entities)
         }
         ],
     temperature=1,
@@ -124,7 +127,54 @@ def generate_pseudonyms(entities):
     )
 
     # Parse the response into a dictionary
-    response = completion.choices[0].message
+    response = completion.choices[0].message.content
     pseudonym_map = json.loads(response)
     
     return pseudonym_map
+
+import logging
+
+def pseudonymization(tagged_text, pseudonym_map, logger=None):
+    """
+    Replace entities tagged as <to_pseudonym> in the text with pseudonyms.
+    
+    Args:
+        tagged_text (str): Text with entities tagged as <to_pseudonym>{entity}</to_pseudonym>
+        pseudonym_map (dict): Dictionary with 'PII' and 'pseudonym' lists
+        logger (logging.Logger, optional): Logger for tracking replacements
+    """
+    # Configure default logger if not provided
+    if logger is None:
+        logging.basicConfig(level=logging.INFO, 
+                            format='%(asctime)s - %(levelname)s: %(message)s')
+        logger = logging.getLogger(__name__)
+    
+    # Extract PII and pseudonym arrays
+    pii_list = pseudonym_map.get("PII", [])
+    pseudonym_list = pseudonym_map.get("pseudonym", [])
+    
+    # Input validation
+    if not pii_list or not pseudonym_list:
+        logger.error("Empty PII or pseudonym list")
+        raise ValueError("Both PII and pseudonym lists must be non-empty")
+    
+    if len(pii_list) != len(pseudonym_list):
+        logger.error(f"List length mismatch: {len(pii_list)} PIIs vs {len(pseudonym_list)} pseudonyms")
+        raise ValueError("PII and pseudonym lists must have the same length")
+    
+    # Perform replacements with logging
+    replacements_made = 0
+    for original, pseudonym in zip(pii_list, pseudonym_list):
+        tagged_entity = f"<to_pseudonym>{original}</to_pseudonym>"
+        if tagged_entity in tagged_text:
+            tagged_text = tagged_text.replace(tagged_entity, pseudonym)
+            replacements_made += 1
+            logger.info(f"Replaced '{original}' with '{pseudonym}'")
+    
+    logger.info(f"Total replacements: {replacements_made}")
+    
+    # Write the output to a file
+    with open(tagged_text, 'w') as out_f:
+        out_f.write(tagged_text)
+
+    print(f"Annotated file saved to {tagged_text}")
