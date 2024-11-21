@@ -1,3 +1,4 @@
+import re
 from openai import OpenAI
 
 def annotate_pii(input_file, output_file, example_file):
@@ -54,3 +55,8 @@ def annotate_pii(input_file, output_file, example_file):
         out_f.write(response)
 
     print(f"Annotated file saved to {output_file}")
+
+def extract_tags(tagged_text):
+    matches = re.findall(r"<to_pseudonym>(.*?)</to_pseudonym>", tagged_text)
+    return matches
+
