@@ -45,35 +45,35 @@ export OPENAI_API_KEY="your_openai_api_key"
 
 ## Usage
 
-1. Annotate PII in text
+1. Annotate PII in text\
 Use the `tag` argument to annotate text files with <to_pseudonym> tags around PII:
 
 ```bash
 pseudollm tag --input_files file1.txt file2.txt --output_dir ./annotated --example_file example_annotation.txt
 ```
-Arguments:
-`--input_files`: Paths to input text files (can process multiple files). 
-`--output_dir`: Directory to save annotated files.
-`--example_file`: Path to an example file containing sample annotations.
+Arguments:\
+`--input_files`: Paths to input text files (can process multiple files).\ 
+`--output_dir`: Directory to save annotated files.\
+`--example_file`: Path to an example file containing sample annotations.\
 
-2. Generate pseudonymized texts
+2. Generate pseudonymized texts\
 Use the `pseudonymize` argument to generate pseudonymized texts:
 
 ```bash
 pseudollm pseudonymize --input_files ./annotated/*.txt --output_dir ./pseudonymized
 ```
-Arguments:
---input_files: Path to the annotated text files (can process multiple files).
---output_dir: Path to the directory where to save the pseudonymized file.
+Arguments:\
+--input_files: Path to the annotated text files (can process multiple files).\
+--output_dir: Path to the directory where to save the pseudonymized file.\
 
 ### Example Workflow
-Input Text (`file1.txt`):
+Input Text (`file1.txt`):\
 `Dear John Smith, we are pleased to offer you a role at ACME Corp located in New York.`
 
-Annotated Output (`annotated/file1.txt`):
+Annotated Output (`annotated/file1.txt`):\
 `Dear <to_pseudonym>John Smith</to_pseudonym>, we are pleased to offer you a role at <to_pseudonym>ACME Corp</to_pseudonym> located in <to_pseudonym>New York</to_pseudonym>.`
 
-Pseudonymized Output (`pseudonymized/file1.txt`):
+Pseudonymized Output (`pseudonymized/file1.txt`):\
 `Dear Michael Carter, we are pleased to offer you a role at TechNova located in Silverlake.`
 
 ### Technical Details
