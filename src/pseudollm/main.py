@@ -1,6 +1,5 @@
 import argparse
 import argcomplete
-import logging
 from pathlib import Path
 
 from tqdm.auto import tqdm
