@@ -10,7 +10,7 @@ def setup_logger(log_file):
     logger.setLevel(logging.INFO)
     
     file_handler = logging.FileHandler(log_file)
-    formatter = logging.Formatter('%(message)s')  # Simple format with just the message
+    formatter = logging.Formatter('%(message)s') 
     file_handler.setFormatter(formatter)
     logger.addHandler(file_handler)
     
