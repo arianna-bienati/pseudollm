@@ -4,7 +4,7 @@ import re
 
 from openai import OpenAI
 
-def setup_logger(log_file = "pseudonymization.log"):
+def setup_logger(log_file):
     """Set up a simple file logger"""
     logger = logging.getLogger('pseudonymization')
     logger.setLevel(logging.INFO)

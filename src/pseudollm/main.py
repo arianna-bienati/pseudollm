@@ -20,9 +20,10 @@ def _tag(args):
         print(f"Annotated and saved to {output_file}")
 
 def _pseudonymize(args):
-    logger = process.setup_logger()
     output_dir = Path(args.output_dir)
     output_dir.mkdir(exist_ok=True)
+
+    logger = process.setup_logger(log_file= output_dir / "pseudonymization.log")
 
     for input_file in tqdm(args.input_files, desc="Pseudonymizing files"):
         input_path = Path(input_file).resolve()
