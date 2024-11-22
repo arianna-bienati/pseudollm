@@ -66,6 +66,9 @@ Arguments:
 * `--input_files`: Path to the annotated text files (can process multiple files).
 * `--output_dir`: Path to the directory where to save the pseudonymized file.
 
+> [!NOTE]  
+> The package does not provide an integrated pipeline of the two steps as a nudge to do a quality check on the output of the annotation step.
+
 ### Example Workflow
 Input Text (`file1.txt`):\
 `Dear John Smith, we are pleased to offer you a role at ACME Corp located in New York.`
@@ -76,7 +79,7 @@ Annotated Output (`annotated/file1.txt`):\
 Pseudonymized Output (`pseudonymized/file1.txt`):\
 `Dear Michael Carter, we are pleased to offer you a role at TechNova located in Silverlake.`
 
-### Technical Details
+## Technical Details
 
 **Annotation**: Uses OpenAI gpt-4o-mini to analyze text and tag PII with `<to_pseudonym>` markers.
 
