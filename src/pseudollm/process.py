@@ -173,4 +173,4 @@ def pseudonymization(tagged_text, pseudonym_map, logger):
             replacements_made += 1
             logger.info(f"Replaced '{original}' with '{pseudonym}'")
     
-    return tagged_text
+    return tagged_text, replacements_made
