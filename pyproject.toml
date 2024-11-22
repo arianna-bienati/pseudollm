@@ -21,7 +21,9 @@ classifiers = [
 ]
 dependencies = [
   "argcomplete>=3",
-  "openai>=1"
+  "openai>=1",
+  "tqdm>=4",
+  "to-json-schema>1"
 ]
 
 version = "0.0.1"
