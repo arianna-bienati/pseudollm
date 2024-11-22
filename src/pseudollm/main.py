@@ -1,5 +1,6 @@
 import argparse
 import argcomplete
+import logging
 from pathlib import Path
 
 from tqdm.auto import tqdm
@@ -20,17 +21,26 @@ def _tag(args):
         print(f"Annotated and saved to {output_file}")
 
 def _pseudonymize(args):
+    logger = process.setup_logger()
     output_dir = Path(args.output_dir)
     output_dir.mkdir(exist_ok=True)
 
     for input_file in tqdm(args.input_files, desc="Pseudonymizing files"):
         input_path = Path(input_file).resolve()
+        logger.info(f"\nProcessing file: {input_path.name}")
+
         with open(input_file, 'r') as f:
             file_content = f.read()
         
         matches = process.extract_tags(file_content)
+        logger.info(f"Found {len(matches)} entities to pseudonymize")
+        
         pseudonym_dict = process.generate_pseudonyms(matches)
-        pseudonym_text = process.pseudonymization(file_content, pseudonym_dict)
+        pseudonym_text, replacements_made = process.pseudonymization(file_content, pseudonym_dict, logger)
+        logger.info(f"Total replacements: {replacements_made}")
+
+        if len(matches) != replacements_made:
+            logger.warning(f"⚠️ Mismatch: Expected {len(matches)} replacements, made {replacements_made}")
 
         output_file = output_dir / f"{input_path.stem}_pseudonym{input_path.suffix}"
         with open(output_file, 'w') as out_f:
