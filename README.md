@@ -63,8 +63,8 @@ Use the `pseudonymize` argument to generate pseudonymized texts:
 pseudollm pseudonymize --input_files ./annotated/*.txt --output_dir ./pseudonymized
 ```
 Arguments:
-* --input_files: Path to the annotated text files (can process multiple files).
-* --output_dir: Path to the directory where to save the pseudonymized file.
+* `--input_files`: Path to the annotated text files (can process multiple files).
+* `--output_dir`: Path to the directory where to save the pseudonymized file.
 
 ### Example Workflow
 Input Text (`file1.txt`):\
@@ -93,10 +93,10 @@ Pseudonymized Output (`pseudonymized/file1.txt`):\
 * support also other models (e.g., open source models)
 
 ## Contributing
-Fork this repository.
-Create a feature branch: `git checkout -b feature-name`.
-Commit your changes: `git commit -m "Add feature-name"`.
-Push to your branch: `git push origin feature-name`.
+Fork this repository.\
+Create a feature branch: `git checkout -b feature-name`.\
+Commit your changes: `git commit -m "Add feature-name"`.\
+Push to your branch: `git push origin feature-name`.\
 Open a pull request.
 
 ## License
