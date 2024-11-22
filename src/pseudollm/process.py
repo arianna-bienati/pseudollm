@@ -4,6 +4,18 @@ import re
 
 from openai import OpenAI
 
+def setup_logger(log_file: "pseudonymization.log"):
+    """Set up a simple file logger"""
+    logger = logging.getLogger('pseudonymization')
+    logger.setLevel(logging.INFO)
+    
+    file_handler = logging.FileHandler(log_file)
+    formatter = logging.Formatter('%(message)s')  # Simple format with just the message
+    file_handler.setFormatter(formatter)
+    logger.addHandler(file_handler)
+    
+    return logger
+
 def annotate_pii(input_file, output_file, example_file):
     """
     Annotates a text file with tags for personally identifiable information (PII).
@@ -130,21 +142,15 @@ def generate_pseudonyms(entities):
     
     return pseudonym_map
 
-def pseudonymization(tagged_text, pseudonym_map, logger=None):
+def pseudonymization(tagged_text, pseudonym_map, logger):
     """
     Replace entities tagged as <to_pseudonym> in the text with pseudonyms.
     
     Args:
         tagged_text (str): Text with entities tagged as <to_pseudonym>{entity}</to_pseudonym>
         pseudonym_map (dict): Dictionary with 'PII' and 'pseudonym' lists
-        logger (logging.Logger, optional): Logger for tracking replacements
-    """
-    # Configure default logger if not provided
-    if logger is None:
-        logging.basicConfig(level=logging.INFO, 
-                            format='%(asctime)s - %(levelname)s: %(message)s')
-        logger = logging.getLogger(__name__)
-    
+        logger (logging.Logger): Logger for tracking replacements
+    """    
     # Extract PII and pseudonym arrays
     pii_list = pseudonym_map.get("PII", [])
     pseudonym_list = pseudonym_map.get("pseudonym", [])
@@ -167,5 +173,4 @@ def pseudonymization(tagged_text, pseudonym_map, logger=None):
             replacements_made += 1
             logger.info(f"Replaced '{original}' with '{pseudonym}'")
     
-    logger.info(f"Total replacements: {replacements_made}")
     return tagged_text
