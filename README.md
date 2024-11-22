@@ -51,10 +51,10 @@ Use the `tag` argument to annotate text files with <to_pseudonym> tags around PI
 ```bash
 pseudollm tag --input_files file1.txt file2.txt --output_dir ./annotated --example_file example_annotation.txt
 ```
-Arguments:\
-`--input_files`: Paths to input text files (can process multiple files).\ 
-`--output_dir`: Directory to save annotated files.\
-`--example_file`: Path to an example file containing sample annotations.\
+Arguments:
+* `--input_files`: Paths to input text files (can process multiple files). 
+* `--output_dir`: Directory to save annotated files.
+* `--example_file`: Path to an example file containing sample annotations.
 
 2. Generate pseudonymized texts\
 Use the `pseudonymize` argument to generate pseudonymized texts:
@@ -62,9 +62,9 @@ Use the `pseudonymize` argument to generate pseudonymized texts:
 ```bash
 pseudollm pseudonymize --input_files ./annotated/*.txt --output_dir ./pseudonymized
 ```
-Arguments:\
---input_files: Path to the annotated text files (can process multiple files).\
---output_dir: Path to the directory where to save the pseudonymized file.\
+Arguments:
+* --input_files: Path to the annotated text files (can process multiple files).
+* --output_dir: Path to the directory where to save the pseudonymized file.
 
 ### Example Workflow
 Input Text (`file1.txt`):\
