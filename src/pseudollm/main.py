@@ -48,6 +48,24 @@ def _pseudonymize(args):
 
         print(f"Pseudonymized and saved to {output_file}")
 
+def _anonymize(args):
+    output_dir = Path(args.output_dir)
+    output_dir.mkdir(exist_ok=True)
+
+    for input_file in tqdm(args.input_files, desc="Anonymizing files"):
+        input_path = Path(input_file).resolve()
+
+        with open(input_file, 'r') as f:
+            file_content = f.read()
+        
+        anonym_text = process.anonimyzation(file_content)
+
+        output_file = output_dir / f"{input_path.stem}_anonym{input_path.suffix}"
+        with open(output_file, 'w') as out_f:
+            out_f.write(anonym_text)
+
+        print(f"Anonymized and saved to {output_file}")
+
 def main():
     parser = argparse.ArgumentParser(
         description="Pseudonymize Personally Identifiable Information using OpenAI LLMs",
@@ -103,6 +121,23 @@ def main():
     
     parser_pseudonymize.set_defaults(func=_pseudonymize)
     
+    parser_anonymize = subparsers.add_parser('anonymize',
+    description='Anonymize Personally Identifiable Information in texts',
+    help='Anonymize Personally Identifiable Information in texts')
+    
+    parser_anonymize.add_argument("-o", "--output_dir",
+        type=str,
+        default=".",
+        help="Output directory. Default: Current directory.")
+    
+    parser_anonymize.add_argument("-i", "--input_files",
+        type=str,
+        nargs="+",
+        required=True,
+        help="Input text files.")
+    
+    parser_anonymize.set_defaults(func=_anonymize)
+
     args = parser.parse_args()
     
     if not hasattr(args, 'func'):
