@@ -120,7 +120,7 @@ def extract_tags(tagged_text):
     unique_matches = list(set(matches))
     return unique_matches
 
-def generate_pseudonyms(entities):
+def generate_pseudonyms(entities, gpt_model = "gpt-4o"):
     """
     Generate pseudonyms for a set of entities, considering their interdependencies.
 
@@ -133,26 +133,25 @@ def generate_pseudonyms(entities):
     # Initialize OpenAI client
     client = OpenAI()
 
-    # Construct a single prompt with all entities
-    completion = client.chat.completions.create(
-    model="gpt-4o",
-    messages=[
+    prompt = [
         {
         "role": "system",
-        "content":  [{
-            "type": "text",
-            "text": "You are a pseudonym generator. You will be provided with a list of personally identifiable information (PII). Your task is to assign suitable pseudonyms to each of the entities, using the pseudonym field. Ensure the pseudonyms match the tone and cultural context of the entities, contain the same number of words, and are consistent within the set."
-    }]},
+        "content":  "You are a pseudonym generator. You will be provided with a list of personally identifiable information (PII). Your task is to assign suitable pseudonyms to each of the entities, using the pseudonym field. Ensure the pseudonyms match the tone and cultural context of the entities, contain the same number of words, and are consistent within the set."
+        },
         {
             "role": "user", 
             "content": "\n".join(entities)
         }
-        ],
+        ]
+
+    prompt_tokens = num_tokens_from_messages(prompt, gpt_model)
+
+    # Construct a single prompt with all entities
+    completion = client.chat.completions.create(
+    model=gpt_model,
+    messages=prompt,
     temperature=1,
-    max_tokens=2048,
-    top_p=1,
-    frequency_penalty=0,
-    presence_penalty=0,
+    max_tokens=prompt_tokens+200,
     response_format={
         "type": "json_schema",
         "json_schema": {
