@@ -9,18 +9,25 @@ This project provides a pipeline for pseudonymizing personally identifiable info
 * Replace tagged PII with pseudonyms in the text while maintaining consistency between them and context.
 * Support for processing multiple files through a command-line interface (CLI).
 
+### New features 27/11/2024
+* During the annotation process the 'type' of entity is also specified using the tag `<to_pseudodym type = "value">`. Possible entity types are PER (person), LOC (location), ORG (organization) and MISC (miscellanea). This simple ontology is taken from [packages with 4 entity types in Stanza](https://stanfordnlp.github.io/stanza/ner_models.html).
+* This information can be used with the `anonymize` subparser to obtain a text pseudonymized with more general placeholders. Useful when a stronger pseudonymization is needed and there is no need to maintain the text's natural flow.
+
 ## Project Structure
 ```graphql
 .
 ├── LICENSE
 ├── README.md
 ├── pyproject.toml
-└── src
-    └── pseudollm
-        ├── __init__.py
-        ├── dict-to-schema.py   # utility script to create a JSON schema given a dictionary
-        ├── main.py             # CLI script
-        └── process.py          # Functions
+├── src
+│   └── pseudollm
+│       ├── __init__.py         
+│       ├── dict-to-schema.py   # Utility script to create a JSON schema given a dictionary
+│       ├── main.py             # CLI script
+│       └── process.py          # Functions
+└── test_data                   # All you need to test the package:
+    ├── example_tagged.txt      # An hand-tagged text that serves as an example for tagging
+    └── test.txt                # AI generated text with plenty of Personally Identifiable Information
 ```
 
 ## Installation
@@ -46,53 +53,69 @@ export OPENAI_API_KEY="your_openai_api_key"
 ## Usage
 
 1. Annotate PII in text\
-Use the `tag` argument to annotate text files with <to_pseudonym> tags around PII:
+Use the `tag` argument to annotate text files with <to_pseudonym type = 'value'> tags around PII:
 
 ```bash
-pseudollm tag --input_files file1.txt file2.txt --output_dir ./annotated --example_file example_annotation.txt
+pseudollm tag -i ./test_data/test.txt -o ./test_data -ex ./test_data/example_tagged.txt 
 ```
 Arguments:
 * `--input_files`: Paths to input text files (can process multiple files). 
-* `--output_dir`: Directory to save annotated files.
+* `--output_dir`: Directory to save annotated files. Default is current directory.
 * `--example_file`: Path to an example file containing sample annotations.
+
+> [!TIP]
+> Manually check the output of this first step!
 
 2. Generate pseudonymized texts\
 Use the `pseudonymize` argument to generate pseudonymized texts:
 
 ```bash
-pseudollm pseudonymize --input_files ./annotated/*.txt --output_dir ./pseudonymized
+pseudollm pseudonymize -i ./test_data/test_tagged.txt -o ./test_data
 ```
 Arguments:
 * `--input_files`: Path to the annotated text files (can process multiple files).
 * `--output_dir`: Path to the directory where to save the pseudonymized file.
 
+3. OR pseudonymize texts with NER tags\
+Use the `ner_pseudonymize` argument to replace Personally Identifiable Information with Named Entities tags:
+
+```bash
+pseudollm ner_pseudonymize -i ./test_data/test_tagged.txt -o ./test_data
+```
+
 > [!NOTE]  
-> The package does not provide an integrated pipeline of the two steps as a nudge to do a quality check on the output of the annotation step.
+> The package does not provide an integrated pipeline of the tagging > pseudonymizing/anonymizing steps as a nudge to do a quality check on the output of the annotation step.
 
 ### Example Workflow
-Input Text (`file1.txt`):\
+Input Text:\
 `Dear John Smith, we are pleased to offer you a role at ACME Corp located in New York.`
 
-Annotated Output (`annotated/file1.txt`):\
-`Dear <to_pseudonym>John Smith</to_pseudonym>, we are pleased to offer you a role at <to_pseudonym>ACME Corp</to_pseudonym> located in <to_pseudonym>New York</to_pseudonym>.`
+Tagged Output:\
+`Dear <to_pseudonym type = "PER">John Smith</to_pseudonym>, we are pleased to offer you a role at <to_pseudonym type = "ORG">ACME Corp</to_pseudonym> located in <to_pseudonym type = "LOC">New York</to_pseudonym>.`
 
-Pseudonymized Output (`pseudonymized/file1.txt`):\
+Pseudonymized Output:\
 `Dear Michael Carter, we are pleased to offer you a role at TechNova located in Silverlake.`
+
+Pseudonymized with NER Output:\
+`Dear [PER], we are pleased to offer you a role at [ORG] located in [LOC].`
 
 ## Technical Details
 
-**Annotation**: Uses OpenAI gpt-4o-mini to analyze text and tag PII with `<to_pseudonym>` markers.
+**Token count**: Uses the `tiktoken` package to count the number of tokens required to perform the tagging and the pseudonymization task (with a margin of 200 tokens) and sets this estimate for the `max_token` parameter.
 
-**Pseudonym Generation**: Processes all PII in a text in a single prompt to maintain consistency across related entities. Returns a JSON schema with PII (original entities) and pseudonym (generated pseudonyms) arrays.
+**Annotation**: Uses OpenAI gpt-4o-mini to tag the PII with `<to_pseudonym type = "value">` markers.
 
-**Replacement**: Replaces all occurrences of `<to_pseudonym>{entity}</to_pseudonym>` with the corresponding pseudonym from the generated JSON schema.
+**Pseudonym Generation**: Uses OpenAI gpt-4o to process all PII in a text and returns a JSON schema with PII (original entities) and pseudonym (generated pseudonyms) arrays. All PII are given in a single prompt to maintain consistency across related entities.
+
+**Replacement**: Replaces all occurrences of `<to_pseudonym type = "value">{entity}</to_pseudonym>` with the corresponding pseudonym from the generated JSON schema.\
+OR replaces all occurrences of `<to_pseudonym type = "value">{entity}</to_pseudonym>` with the value given in the attribute 'type'.
 
 ## Known Issues
 * Case Sensitivity: Entity replacement is case-sensitive.
-* Token Limitations: OpenAI models have token limits. You can increase token limits by editing the related functions.
+* Token Limitations: OpenAI models have token limits. The token limit for the models set as default (gpt-4o-mini and gpt-4o) is 16,384 tokens. If you know you have texts longer than this limit, consider splitting them. Use the `tiktoken` library to get an estimate.
 
 ## Future Enhancements
-* add `max_tokens` and `model` as parameters of the functions and options in the CLI.
+* add `max_tokens` and `model` as parameters of the functions and options in the CLI. :white_check_mark: done on 27/11/2024
 * support also other models (e.g., open source models)
 
 ## Contributing
