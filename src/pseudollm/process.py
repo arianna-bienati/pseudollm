@@ -116,7 +116,7 @@ def annotate_pii(input_file, output_file, example_file, gpt_model = "gpt-4o-mini
     print(f"Annotated file saved to {output_file}")
 
 def extract_tags(tagged_text):
-    matches = re.findall(r"<to_pseudonym>(.*?)</to_pseudonym>", tagged_text)
+    matches = re.findall(r'<to_pseudonym type = "[^"]+">(.*?)</to_pseudonym>', tagged_text)
     unique_matches = list(set(matches))
     return unique_matches
 
@@ -212,10 +212,9 @@ def pseudonymization(tagged_text, pseudonym_map, logger):
     # Perform replacements with logging
     replacements_made = 0
     for original, pseudonym in zip(pii_list, pseudonym_list):
-        tagged_entity = f"<to_pseudonym>{original}</to_pseudonym>"
-        if tagged_entity in tagged_text:
-            tagged_text = tagged_text.replace(tagged_entity, pseudonym)
-            replacements_made += 1
-            logger.info(f"Replaced '{original}' with '{pseudonym}'")
+        tagged_entity_pattern = rf'<to_pseudonym type = "[^"]+">{re.escape(original)}</to_pseudonym>'
+        tagged_text = re.sub(tagged_entity_pattern, pseudonym, tagged_text)
+        replacements_made += 1
+        logger.info(f"Replaced '{original}' with '{pseudonym}'")
     
     return tagged_text, replacements_made
