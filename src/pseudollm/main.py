@@ -48,7 +48,7 @@ def _pseudonymize(args):
 
         print(f"Pseudonymized and saved to {output_file}")
 
-def _anonymize(args):
+def _ner_pseudonymization(args):
     output_dir = Path(args.output_dir)
     output_dir.mkdir(exist_ok=True)
 
@@ -58,7 +58,7 @@ def _anonymize(args):
         with open(input_file, 'r') as f:
             file_content = f.read()
         
-        anonym_text = process.anonimyzation(file_content)
+        anonym_text = process.ner_pseudonymization(file_content)
 
         output_file = output_dir / f"{input_path.stem}_anonym{input_path.suffix}"
         with open(output_file, 'w') as out_f:
@@ -121,22 +121,22 @@ def main():
     
     parser_pseudonymize.set_defaults(func=_pseudonymize)
     
-    parser_anonymize = subparsers.add_parser('anonymize',
-    description='Anonymize Personally Identifiable Information in texts',
-    help='Anonymize Personally Identifiable Information in texts')
+    parser_ner_pseudonymization = subparsers.add_parser('pseudonymize with Named Entities tags',
+    description='Pseudonymize Personally Identifiable Information with Named Entities tags',
+    help='Pseudonymize Personally Identifiable Information with Named Entities tags')
     
-    parser_anonymize.add_argument("-o", "--output_dir",
+    parser_ner_pseudonymization.add_argument("-o", "--output_dir",
         type=str,
         default=".",
         help="Output directory. Default: Current directory.")
     
-    parser_anonymize.add_argument("-i", "--input_files",
+    parser_ner_pseudonymization.add_argument("-i", "--input_files",
         type=str,
         nargs="+",
         required=True,
         help="Input text files.")
     
-    parser_anonymize.set_defaults(func=_anonymize)
+    parser_ner_pseudonymization.set_defaults(func=_ner_pseudonymization)
 
     args = parser.parse_args()
     
