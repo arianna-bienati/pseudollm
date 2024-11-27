@@ -218,7 +218,7 @@ def pseudonymization(tagged_text, pseudonym_map, logger):
     
     return tagged_text, replacements_made
 
-def anonimyzation(tagged_text):
+def ner_pseudonymization(tagged_text):
     """
     Replace entities in <to_pseudonym type="value">{entity}</to_pseudonym> tags 
     with their 'type' attribute value wrapped in square brackets.
