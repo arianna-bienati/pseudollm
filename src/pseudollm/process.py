@@ -94,12 +94,16 @@ def annotate_pii(input_file, output_file, example_file, gpt_model = "gpt-4o-mini
                 "role": "user",
                 "content": f"Do the same on the following text. Just tag the text: do not change the original text.\n\nText:{file_content}"
             }
-        ],
-        temperature=1,
-        max_tokens=5079,
-        top_p=1,
-        frequency_penalty=0,
-        presence_penalty=0
+        ]
+    
+    prompt_tokens = num_tokens_from_messages(prompt, gpt_model)
+
+    # Generate a completion using the model
+    completion = client.chat.completions.create(
+        model=gpt_model,
+        messages=prompt,
+        temperature=0,
+        max_tokens=prompt_tokens + 200
     )
 
     # Extract the model's response (the completion result)
