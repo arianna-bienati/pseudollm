@@ -217,3 +217,21 @@ def pseudonymization(tagged_text, pseudonym_map, logger):
         logger.info(f"Replaced '{original}' with '{pseudonym}'")
     
     return tagged_text, replacements_made
+
+def anonimyzation(tagged_text):
+    """
+    Replace entities in <to_pseudonym type="value">{entity}</to_pseudonym> tags 
+    with their 'type' attribute value wrapped in square brackets.
+
+    Args:
+        tagged_text (str): The text containing <to_pseudonym type="value">{entity}</to_pseudonym> tags.
+
+    Returns:
+        str: Text with entities replaced by their 'type' attribute values wrapped in square brackets.
+    """
+    # Replace each <to_pseudonym type="value">{entity}</to_pseudonym> with [type]
+    return re.sub(
+        r'<to_pseudonym type = "([^"]+)">.*?</to_pseudonym>', 
+        lambda match: f"[{match.group(1)}]", 
+        tagged_text
+    )
