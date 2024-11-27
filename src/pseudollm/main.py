@@ -60,7 +60,7 @@ def _ner_pseudonymization(args):
         
         anonym_text = process.ner_pseudonymization(file_content)
 
-        output_file = output_dir / f"{input_path.stem}_anonym{input_path.suffix}"
+        output_file = output_dir / f"{input_path.stem}_ner_pseudonym{input_path.suffix}"
         with open(output_file, 'w') as out_f:
             out_f.write(anonym_text)
 
