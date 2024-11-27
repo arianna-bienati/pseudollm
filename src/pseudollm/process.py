@@ -81,15 +81,10 @@ def annotate_pii(input_file, output_file, example_file, gpt_model = "gpt-4o-mini
     with open(example_file, 'r') as ex:
         example = ex.read()
 
-    # Generate a completion using the model
-    completion = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[
+    prompt = [
             {
                 "role": "user",
-                "content": "Annotate all Personally Identifiable Information in the following text (e.g., names, places, organizations, project names, etc.). "
-                           "Use the tags <to_pseudonym> </to_pseudonym> to tag them. Do not use different tags. Just output the tagged text, without any further comment. "
-                           "Do not change the original text."
+                "content": "Annotate all Personally Identifiable Information in the following text (e.g., names, places, organizations, project names, etc.). Use the tags <to_pseudonym type = 'value'> </to_pseudonym> to tag them. Use the 'type' attribute to detail which kind of PII it is. You can choose between four types: PER for persons, LOC for locations, ORG for organizations and MISC for anything else. Just output the tagged text, without any further comment. Do not change the original text."
             },
             {
                 "role": "assistant",
