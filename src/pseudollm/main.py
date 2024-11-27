@@ -76,6 +76,10 @@ def main():
         type=str,
         help="Input example file.")
     
+    parser_tag.add_argument("-m", "--gpt_model",
+        type=str,
+        help="Choose gpt_model. Default = 'gpt_4o_mini'")
+
     parser_tag.set_defaults(func=_tag)
 
     parser_pseudonymize = subparsers.add_parser('pseudonymize',
@@ -92,6 +96,10 @@ def main():
         nargs="+",
         required=True,
         help="Input text files.")
+    
+    parser_pseudonymize.add_argument("-m", "--gpt_model",
+    type=str,
+    help="Choose gpt_model. Default = 'gpt_4o'")
     
     parser_pseudonymize.set_defaults(func=_pseudonymize)
     
