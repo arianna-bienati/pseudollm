@@ -121,7 +121,7 @@ def main():
     
     parser_pseudonymize.set_defaults(func=_pseudonymize)
     
-    parser_ner_pseudonymization = subparsers.add_parser('pseudonymize with Named Entities tags',
+    parser_ner_pseudonymization = subparsers.add_parser('ner_pseudonymize',
     description='Pseudonymize Personally Identifiable Information with Named Entities tags',
     help='Pseudonymize Personally Identifiable Information with Named Entities tags')
     
