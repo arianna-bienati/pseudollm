@@ -23,7 +23,8 @@ dependencies = [
   "argcomplete>=3",
   "openai>=1",
   "tqdm>=4",
-  "to-json-schema>1"
+  "to-json-schema>=1",
+  "tiktoken>=0.8"
 ]
 
 version = "0.0.1"
