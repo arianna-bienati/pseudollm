@@ -2,6 +2,8 @@ import json
 import logging
 import re
 
+from difflib import unified_diff
+
 from openai import OpenAI
 import tiktoken
 
@@ -235,3 +237,42 @@ def ner_pseudonymization(tagged_text):
         lambda match: f"[{match.group(1)}]", 
         tagged_text
     )
+
+def validate_pseudonymization(file1, file2):
+    """
+    Validates two file versions by comparing their contents using difflib.
+    Counts insertions and deletions and ensures they are equal.
+    If not, prints the filename stem of the first file.
+
+    Args:
+        file1_path (str): Path to the first file.
+        file2_path (str): Path to the second file.
+    """
+
+    # Read file contents
+    file1_content = file1.read_text()
+    file2_content = file2.read_text()
+
+    # Tokenize file contents by splitting on whitespace
+    file1_tokens = file1_content.split()
+    file2_tokens = file2_content.split()
+
+    # Use difflib to get a unified diff
+    diff = unified_diff(file1_tokens, file2_tokens, lineterm='')
+
+    # Count insertions and deletions
+    insertions = 0
+    deletions = 0
+
+    inserted_tokens = []
+    deleted_tokens = []
+
+    for line in diff:
+        if line.startswith('+') and not line.startswith('+++'):
+            insertions += 1
+            inserted_tokens.append(line[1:]) # exclude '+'
+        elif line.startswith('-') and not line.startswith('---'):
+            deletions += 1
+            deleted_tokens.append(line[1:]) # exclude '-'
+
+    return insertions, deletions, inserted_tokens, deleted_tokens

@@ -66,6 +66,34 @@ def _ner_pseudonymization(args):
 
         print(f"Anonymized and saved to {output_file}")
 
+def _validate(args):
+    for file1 in tqdm(args.file1, desc="Validating pseudonymization"):
+        file1 = Path(file1).resolve()
+    
+    for file2 in tqdm(args.file2, desc="Validating pseudonymization"):
+        file2 = Path(file2).resolve()
+    
+    insertions, deletions, inserted_tokens, deleted_tokens = process.validate_pseudonymization(file1, file2)
+
+    # Check if insertions and deletions are equal
+    if insertions != deletions:
+        print(f"Mismatch in {file1.stem}: {insertions} insertions, {deletions} deletions.")
+            
+        # Print inserted and deleted tokens to the terminal in TSV format
+        for inserted, deleted in zip(inserted_tokens, deleted_tokens):
+            print(f'i: {inserted}', end="\t")
+            print(f'd: {deleted}')
+
+        # Handle any leftover tokens if lists are of unequal length
+        for extra in inserted_tokens[len(deleted_tokens):]:
+            print(f'i: {extra}', end="\t")
+            print("")
+        for extra in deleted_tokens[len(inserted_tokens):]:
+            print("", end="\t")
+            print(f'd: {extra}')
+    else:
+        print(f"File {file1.stem} is balanced with {insertions} changes.")
+
 def main():
     parser = argparse.ArgumentParser(
         description="Pseudonymize Personally Identifiable Information using OpenAI LLMs",
@@ -137,6 +165,24 @@ def main():
         help="Input text files.")
     
     parser_ner_pseudonymization.set_defaults(func=_ner_pseudonymization)
+
+    parser_validate = subparsers.add_parser('validate',
+    description = 'Validate pseudonymized texts against original texts',
+    help='Validate pseudonymized texts against original texts')
+
+    parser_validate.add_argument("-1", "--file1",
+                                 type=str,
+                                 nargs="+",
+                                 required=True,
+                                 help="Input original txt file(s).")
+    
+    parser_validate.add_argument("-2", "--file2",
+                                 type=str,
+                                 nargs="+",
+                                 required=True,
+                                 help="Input pseudonymized txt file(s).")
+    
+    parser_validate.set_defaults(func=_validate)
 
     args = parser.parse_args()
     
