@@ -93,6 +93,9 @@ def _validate(args):
             print(f'd: {extra}')
     else:
         print(f"File {file1.stem} is balanced with {insertions} changes.")
+        for inserted, deleted in zip(inserted_tokens, deleted_tokens):
+            print(f'i: {inserted}', end="\t")
+            print(f'd: {deleted}')
 
 def main():
     parser = argparse.ArgumentParser(
