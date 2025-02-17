@@ -153,7 +153,7 @@ def generate_pseudonyms(entities, gpt_model = "gpt-4o"):
     model=gpt_model,
     messages=prompt,
     temperature=1,
-    max_tokens=prompt_tokens+200,
+    max_tokens=prompt_tokens*2,
     response_format={
         "type": "json_schema",
         "json_schema": {
