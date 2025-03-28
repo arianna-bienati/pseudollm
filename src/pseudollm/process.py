@@ -115,8 +115,6 @@ def annotate_pii(input_file, output_file, example_file, gpt_model = "gpt-4o-mini
     with open(output_file, 'w') as out_f:
         out_f.write(response)
 
-    print(f"Annotated file saved to {output_file}")
-
 def extract_tags(tagged_text):
     matches = re.findall(r'<to_pseudonym type = "[^"]+">(.*?)</to_pseudonym>', tagged_text)
     unique_matches = list(set(matches))
