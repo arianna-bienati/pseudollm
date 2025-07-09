@@ -59,7 +59,7 @@ export OPENAI_API_KEY="your_openai_api_key"
 Use the `tag` argument to annotate text files with <to_pseudonym type = 'value'> tags around PII:
 
 ```bash
-pseudollm tag -i ./test_data/test.txt -o ./test_data -ex ./test_data/example_tagged.txt 
+pseudollm tag -i ./test_data/en_test.txt -o ./test_data -ex ./test_data/example_tagged.txt 
 ```
 Arguments:
 * `--input_files`: Paths to input text files (can process multiple files). 
@@ -73,7 +73,7 @@ Arguments:
 Use the `pseudonymize` argument to generate pseudonymized texts:
 
 ```bash
-pseudollm pseudonymize -i ./test_data/test_tagged.txt -o ./test_data
+pseudollm pseudonymize -i ./test_data/en_test_tagged.txt -o ./test_data
 ```
 Arguments:
 * `--input_files`: Path to the annotated text files (can process multiple files).
@@ -83,7 +83,7 @@ Arguments:
 Use the `ner_pseudonymize` argument to replace Personally Identifiable Information with Named Entities tags:
 
 ```bash
-pseudollm ner_pseudonymize -i ./test_data/test_tagged.txt -o ./test_data
+pseudollm ner_pseudonymize -i ./test_data/en_test_tagged.txt -o ./test_data
 ```
 
 > [!NOTE]  
@@ -93,7 +93,7 @@ pseudollm ner_pseudonymize -i ./test_data/test_tagged.txt -o ./test_data
 Use the `validate` argument to check the replacements. The output tells you whether the number of insertions and deletions is the same and lists all insertions and deletions.
 
 ```bash
-pseudollm validate -1 ./test_data/test.txt -2 ./test_data/test_tagged_pseudonym.txt
+pseudollm validate -1 ./test_data/en_test.txt -2 ./test_data/en_test_tagged_pseudonym.txt
 ```
 
 ### Example Workflow
