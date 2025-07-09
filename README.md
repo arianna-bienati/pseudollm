@@ -30,7 +30,8 @@ This project provides a pipeline for pseudonymizing personally identifiable info
 │       └── process.py          # Functions
 └── test_data                   # All you need to test the package:
     ├── example_tagged.txt      # An hand-tagged text that serves as an example for tagging
-    └── test.txt                # AI generated text with plenty of Personally Identifiable Information
+    └── en_test.txt             # AI generated text with plenty of Personally Identifiable Information (English)
+    └── it_test.txt             # AI generated text with plenty of Personally Identifiable Information (Italian)
 ```
 
 ## Installation
