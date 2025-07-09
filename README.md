@@ -13,6 +13,9 @@ This project provides a pipeline for pseudonymizing personally identifiable info
 * During the annotation process the 'type' of entity is also specified using the tag `<to_pseudodym type = "value">`. Possible entity types are PER (person), LOC (location), ORG (organization) and MISC (miscellanea). This simple ontology is taken from [packages with 4 entity types in Stanza](https://stanfordnlp.github.io/stanza/ner_models.html).
 * This information can be used with the `anonymize` subparser to obtain a text pseudonymized with more general placeholders. Useful when a stronger pseudonymization is needed and there is no need to maintain the text's natural flow.
 
+### New feature 21/01/2025
+* You can now compare insertions and deletions in the original vs. the pseudonymized text using the `validate` argument. It uses difflib with a simple tokenization under the hood.
+
 ## Project Structure
 ```graphql
 .
@@ -86,6 +89,13 @@ pseudollm ner_pseudonymize -i ./test_data/test_tagged.txt -o ./test_data
 > [!NOTE]  
 > The package does not provide an integrated pipeline of the tagging > pseudonymizing/anonymizing steps as a nudge to do a quality check on the output of the annotation step.
 
+4. Validate the output
+Use the `validate` argument to check the replacements. The output tells you whether the number of insertions and deletions is the same and lists all insertions and deletions.
+
+```bash
+pseudollm validate -1 ./test_data/test.txt -2 ./test_data/test_tagged_pseudonym.txt
+```
+
 ### Example Workflow
 Input Text:\
 `Dear John Smith, we are pleased to offer you a role at ACME Corp located in New York.`
@@ -117,6 +127,7 @@ OR replaces all occurrences of `<to_pseudonym type = "value">{entity}</to_pseudo
 ## Future Enhancements
 * add `max_tokens` and `model` as parameters of the functions and options in the CLI. :white_check_mark: done on 27/11/2024
 * support also other models (e.g., open source models)
+* systematically evaluate the tool
 
 ## Contributing
 Fork this repository.\
