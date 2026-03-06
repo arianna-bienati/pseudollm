@@ -1,11 +1,11 @@
 # pseudollm
-Pseudonymization enhanced by OpenAI LLMs
+Pseudonymization enhanced by LLMs
 
-This project provides a pipeline for pseudonymizing personally identifiable information (PII) in text files. It uses a combination of OpenAI's language models and Python to identify sensitive entities, generate culturally appropriate pseudonyms, and replace the original entities with pseudonyms while maintaining the text's natural flow.
+This project provides a pipeline for pseudonymizing personally identifiable information (PII) in text files. It uses LLMs to identify sensitive entities, generate culturally appropriate pseudonyms, and replace the original entities with pseudonyms while maintaining the text's natural flow.
 
 ## Features
 * Automatically annotate PII (e.g., names, organizations, locations) in text files using `<to_pseudonym>` tags.
-* Generate pseudonyms for tagged PII using OpenAI's GPT-based models.
+* Generate pseudonyms for tagged PII using models available through Ollama.
 * Replace tagged PII with pseudonyms in the text while maintaining consistency between them and context.
 * Support for processing multiple files through a command-line interface (CLI).
 
@@ -15,6 +15,9 @@ This project provides a pipeline for pseudonymizing personally identifiable info
 
 ### New feature 21/01/2025
 * You can now compare insertions and deletions in the original vs. the pseudonymized text using the `validate` argument. It uses difflib with a simple tokenization under the hood.
+
+### New feature 06/03/2026
+* It now supports open models through Ollama! Install ollama first and pull the model you want to work with.
 
 ## Project Structure
 ```graphql
@@ -49,9 +52,9 @@ Install package in development mode
 ```bash
 pip install -e .
 ```
-Obtain an OpenAI API key from OpenAI and set it as an environment variable:
+Install Ollama https://ollama.com/ and pull the model you would like to work with
 ```bash
-export OPENAI_API_KEY="your_openai_api_key"
+ollama pull <model_name>
 ```
 
 ## Usage
@@ -112,23 +115,23 @@ Pseudonymized with NER Output:\
 
 ## Technical Details
 
-**Token count**: Uses the `tiktoken` package to count the number of tokens required to perform the tagging and the pseudonymization task (with a margin of 200 tokens) and sets this estimate for the `max_token` parameter.
+**Token count**: Uses a simple heuristic (4 chars ≈ 1 token) to count the number of tokens required to perform the tagging and the pseudonymization task (with a margin) and sets this estimate for the `max_token` parameter.
 
-**Annotation**: Uses OpenAI gpt-4o-mini to tag the PII with `<to_pseudonym type = "value">` markers.
+**Annotation**: Uses by default `deepseek-r1:14b` to tag the PII with `<to_pseudonym type = "value">` markers.
 
-**Pseudonym Generation**: Uses OpenAI gpt-4o to process all PII in a text and returns a JSON schema with PII (original entities) and pseudonym (generated pseudonyms) arrays. All PII are given in a single prompt to maintain consistency across related entities.
+**Pseudonym Generation**: Uses by default `llama3.1:8b` to process all PII in a text and returns a JSON schema with PII (original entities) and pseudonym (generated pseudonyms) arrays. All PII are given in a single prompt to maintain consistency across related entities.
 
 **Replacement**: Replaces all occurrences of `<to_pseudonym type = "value">{entity}</to_pseudonym>` with the corresponding pseudonym from the generated JSON schema.\
 OR replaces all occurrences of `<to_pseudonym type = "value">{entity}</to_pseudonym>` with the value given in the attribute 'type'.
 
 ## Known Issues
 * Case Sensitivity: Entity replacement is case-sensitive.
-* Token Limitations: OpenAI models have token limits. The token limit for the models set as default (gpt-4o-mini and gpt-4o) is 16,384 tokens. If you know you have texts longer than this limit, consider splitting them. Use the `tiktoken` library to get an estimate.
+* Token Limitations: models have input token limits. The token limit for the model set as default (deepseek-r1) is 128k tokens. If you know you have texts longer than this limit, consider splitting them.
 
 ## Future Enhancements
 * add `max_tokens` and `model` as parameters of the functions and options in the CLI. :white_check_mark: done on 27/11/2024
-* support also other models (e.g., open source models)
-* systematically evaluate the tool
+* support also other models (e.g., open source models) :white_check_mark: done on 06/03/2026
+* systematically evaluate the tool 
 
 ## Contributing
 Fork this repository.\
