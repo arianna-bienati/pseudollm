@@ -4,6 +4,7 @@ from pathlib import Path
 
 from tqdm.auto import tqdm
 
+import pseudollm.process_open as process_open
 import pseudollm.process as process
 
 def _tag(args):
@@ -11,12 +12,14 @@ def _tag(args):
     output_dir = Path(args.output_dir)
     output_dir.mkdir(exist_ok=True)
 
+    logger = process.setup_logger(log_file= output_dir / "thinking.log")
+
     # Use tqdm for progress tracking if there are multiple files
     for input_file in tqdm(args.input_files, desc="Tagging files"):
         input_path = Path(input_file).resolve()
         output_file = output_dir / f"{input_path.stem}_tagged{input_path.suffix}"
         example_file = Path(args.example_file).resolve()
-        process.annotate_pii(input_path, output_file, example_file)
+        process_open.annotate_pii_ollama(input_path, output_file, example_file, model=args.model, logger=logger)
         print(f"Annotated and saved to {output_file}")
 
 def _pseudonymize(args):
@@ -35,7 +38,7 @@ def _pseudonymize(args):
         matches = process.extract_tags(file_content)
         logger.info(f"Found {len(matches)} entities to pseudonymize")
         
-        pseudonym_dict = process.generate_pseudonyms(matches)
+        pseudonym_dict = process_open.generate_pseudonyms_ollama(matches, model=args.model)
         pseudonym_text, replacements_made = process.pseudonymization(file_content, pseudonym_dict, logger)
         logger.info(f"Total replacements: {replacements_made}")
 
@@ -99,7 +102,7 @@ def _validate(args):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Pseudonymize Personally Identifiable Information using OpenAI LLMs",
+        description="Pseudonymize Personally Identifiable Information using LLMs",
         add_help=True)
     
     argcomplete.autocomplete(parser)
@@ -125,9 +128,10 @@ def main():
         type=str,
         help="Input example file.")
     
-    parser_tag.add_argument("-m", "--gpt_model",
+    parser_tag.add_argument("-m", "--model",
         type=str,
-        help="Choose gpt_model. Default = 'gpt_4o_mini'")
+        default="deepseek-r1:14b",
+        help="Choose model. Default = 'deepseek-r1:14b'")
 
     parser_tag.set_defaults(func=_tag)
 
@@ -146,9 +150,10 @@ def main():
         required=True,
         help="Input text files.")
     
-    parser_pseudonymize.add_argument("-m", "--gpt_model",
+    parser_pseudonymize.add_argument("-m", "--model",
     type=str,
-    help="Choose gpt_model. Default = 'gpt_4o'")
+    default="llama3.1:8b",
+    help="Choose gpt_model. Default = 'llama3.1:8b'")
     
     parser_pseudonymize.set_defaults(func=_pseudonymize)
     
